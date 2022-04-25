@@ -19,10 +19,10 @@ if( empty($_REQUEST['name'])) {
             $stmnt = $pdo->prepare("INSERT INTO 'player_ratings'
                 ('player_id','atk_rating','def_rating',
                 'num_matches', 'matches_won',
-                'atk_matches','def_matches',
+                'atk_matches','def_matches','last_played',
                 'active')
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            if($stmnt->execute(array($pid,1500.0, 1500.0, 0, 0, 0, 0, false))){
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            if($stmnt->execute(array($pid,1500.0, 1500.0, 0, 0, 0, 0, date(DATE_RFC3339), false))){
                 $result = array('result' => "Player '{$name}' successfully added!");
             } else {
                 $result = array('result' => "An error occurred when adding ratings for '{$name}'.");

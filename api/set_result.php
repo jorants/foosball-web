@@ -32,7 +32,7 @@ function getPlayerFromName($pdo, $name) {
 }
 
 function getRatingsFromId($pdo, $pid) {
-    $q = $pdo->prepare("SELECT player_id,atk_rating,def_rating,num_matches,matches_won,atk_matches,def_matches,active
+    $q = $pdo->prepare("SELECT player_id,atk_rating,def_rating,num_matches,matches_won,atk_matches,def_matches,last_played,active
         FROM player_ratings WHERE player_id = ?");
     $q->execute(array($pid));
     if($row = $q->fetch(PDO::FETCH_ASSOC)) {
@@ -46,6 +46,7 @@ function getRatingsFromId($pdo, $pid) {
         'matches_won' => 0,
         'atk_matches' => 0,
         'def_matches' => 0,
+        'last_played' => date(DATE_RFC3339),
         'active' => true);
 }
 
@@ -197,15 +198,15 @@ function process($data) {
     $stmnt = $pdo->prepare("REPLACE INTO 'player_ratings'
         ('player_id','atk_rating','def_rating',
         'num_matches', 'matches_won',
-        'atk_matches','def_matches',
+        'atk_matches','def_matches','last_played',
         'active')
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     if ($stmnt == false) {
         print_r($pdo->errorInfo());
     } else {
         foreach($playerratings as $p) {
-            $stmnt->execute(array($p['player_id'], $p['atk_rating'], $p['def_rating'], $p['num_matches'], $p['matches_won'], $p['atk_matches'], $p['def_matches'], true));
+            $stmnt->execute(array($p['player_id'], $p['atk_rating'], $p['def_rating'], $p['num_matches'], $p['matches_won'], $p['atk_matches'], $p['def_matches'], date(DATE_RFC3339, $r['time']), true));
         }
     }
 

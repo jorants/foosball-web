@@ -19,7 +19,7 @@ $result->playerpositions = array();
 $result->recentmatches = "";
 
 // "playerlist":
-$q = $pdo->query('SELECT id,name,atk_rating,def_rating,num_matches,matches_won,atk_matches,def_matches,active FROM players INNER JOIN player_ratings on players.id = player_ratings.player_id ORDER BY name ASC');
+$q = $pdo->query('SELECT id,name,atk_rating,def_rating,num_matches,matches_won,atk_matches,def_matches,last_played,active FROM players INNER JOIN player_ratings on players.id = player_ratings.player_id ORDER BY name ASC');
 
 $players = array();
 $abcPlayerIds = array();
@@ -55,7 +55,7 @@ $result->classification = $tbl;
 // "bestattackers":
 $pos = 1;
 $tbl = "";
-$q = $pdo->query("SELECT * FROM player_ratings WHERE active = 1 AND atk_matches >= 5 ORDER BY atk_rating DESC LIMIT 10");
+$q = $pdo->query("SELECT * FROM player_ratings WHERE active = 1 AND atk_matches >= 5 AND last_played > date('now', '-3 month') ORDER BY atk_rating DESC LIMIT 10");
 while($row = $q->fetch(PDO::FETCH_ASSOC)) {
     $tbl .= '<tr>';
     $tbl .= '<td class="text-right">'. $pos++ . '</td>';
@@ -69,7 +69,7 @@ $result->bestattackers = $tbl;
 // "bestdefenders":
 $pos = 1;
 $tbl = "";
-$q = $pdo->query("SELECT * FROM player_ratings WHERE active = 1 AND def_matches >= 5 ORDER BY def_rating DESC LIMIT 10");
+$q = $pdo->query("SELECT * FROM player_ratings WHERE active = 1 AND def_matches >= 5 AND last_played > date('now', '-3 month') ORDER BY def_rating DESC LIMIT 10");
 while($row = $q->fetch(PDO::FETCH_ASSOC)) {
     $tbl .= '<tr>';
     $tbl .= '<td class="text-right">'. $pos++ . '</td>';

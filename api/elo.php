@@ -113,9 +113,9 @@ function fullAnalysis($allmatches, $playerids, $pdo) {
     $stmnt = $pdo->prepare("INSERT INTO 'player_ratings'
         ('player_id','atk_rating','def_rating',
         'num_matches', 'matches_won',
-        'atk_matches','def_matches',
+        'atk_matches','def_matches','last_played',
         'active')
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     if ($stmnt == false) {
         print_r($pdo->errorInfo());
@@ -126,7 +126,7 @@ function fullAnalysis($allmatches, $playerids, $pdo) {
             $active = false;
             if (($tnow - $p['last_match_date']) <= (60+$p['num_matches'])*(24*60*60) )
                 $active = true;
-            $stmnt->execute(array($p['player_id'], $p['atk_rating'], $p['def_rating'], $p['num_matches'], $p['matches_won'], $p['atk_matches'], $p['def_matches'], $active));
+            $stmnt->execute(array($p['player_id'], $p['atk_rating'], $p['def_rating'], $p['num_matches'], $p['matches_won'], $p['atk_matches'], $p['def_matches'], date(DATE_RFC3339, $p['last_match_date']), $active));
         }
     }
 

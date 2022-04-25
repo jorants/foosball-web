@@ -32,7 +32,7 @@ CREATE TABLE 'match_ratings' ('match_id' INTEGER PRIMARY KEY NOT NULL, 'bluedef_
 ----
 -- Table structure for player_ratings
 ----
-CREATE TABLE 'player_ratings' ('player_id' INTEGER PRIMARY KEY NOT NULL, 'atk_rating' REAL, 'def_rating' REAL, 'num_matches' INTEGER, 'matches_won' INTEGER, 'atk_matches' INTEGER, 'def_matches' INTEGER, 'active' BOOLEAN);
+CREATE TABLE 'player_ratings' ('player_id' INTEGER PRIMARY KEY NOT NULL, 'atk_rating' REAL, 'def_rating' REAL, 'num_matches' INTEGER, 'matches_won' INTEGER, 'atk_matches' INTEGER, 'def_matches' INTEGER, 'active' BOOLEAN, 'last_played' TIMESTAMP);
 
 ----
 -- Table structure for statistics
