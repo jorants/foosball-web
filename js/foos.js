@@ -11,6 +11,7 @@ function startup() {
     $(".swapattack").click(swap_attack);
 
     $("#balanceteams").click(balance_teams);
+    $("#speedyteams").click(speedy_teams);
 
     $("#lockbluedef").click(toggle_lock("blue"));
     $("#lockblueatk").click(toggle_lock("blue"));
@@ -265,6 +266,88 @@ function balance_teams(){
             ids = perm;
         }
     }
+
+    set_player('bluedef', ids[0]);
+    set_player('blueatk', ids[1]);
+    set_player('redatk',  ids[2]);
+    set_player('reddef',  ids[3]);
+
+    // reset locks
+    var pos = ["#lockbluedef", "#lockblueatk", "#lockredatk", "#lockreddef"];
+    for(i in pos){
+        $(pos[i]).attr("class", "fas fa-lock-open");
+    }
+
+    elo_prediction();
+}
+
+function speedy_teams(){
+    var ids = [$('#bluedef').val(), $('#blueatk').val(), $('#redatk').val(), $('#reddef').val()];
+    var atkratings =  {[ids[0]] : $('#bluedef').find(':selected').data('atkrating'),
+                       [ids[1]] : $('#blueatk').find(':selected').data('atkrating'),
+                       [ids[2]] : $('#redatk').find(':selected').data('atkrating'),
+                       [ids[3]] : $('#reddef').find(':selected').data('atkrating')};
+    var defratings = {[ids[0]] : $('#bluedef').find(':selected').data('defrating'),
+                      [ids[1]] : $('#blueatk').find(':selected').data('defrating'),
+                      [ids[2]] : $('#redatk').find(':selected').data('defrating'),
+                      [ids[3]] : $('#reddef').find(':selected').data('defrating')}
+
+    var perms = permutator(ids); 
+
+    // filter permutations not satisfying locking contraints
+    perms = perms.filter(function(elt){
+        var pos = ["#lockbluedef", "#lockblueatk", "#lockredatk", "#lockreddef"];
+        for(i in pos){
+            if($(pos[i]).hasClass("fa-lock")){
+                var team = pos[i].search("red") > -1 ? "redteam" : "blueteam";
+                if($(pos[i]).hasClass(team)){
+                    if(elt[i] != ids[i]) return false;
+                }
+                else{ // if index i is a defence then 3-i is also defence, same for attack
+                    if(!(elt[i] == ids[i] || elt[3-i] == ids[i])) return false;
+                }
+            }
+        }
+        return true;
+    });
+
+    // find best balance
+    var smallestDifference = 2;
+    for (i in perms){
+        var perm = perms[i];
+        var blueElo  = 0.565 * defratings[perm[0]]  + 0.435 * atkratings[perm[1]];
+        var redElo  = 0.565 * defratings[perm[3]]  + 0.435 * atkratings[perm[2]];
+
+        var blueValue = 1.0 / (1.0 + Math.pow(10, (redElo - blueElo) / 400.0));
+        var redValue = 1.0 - blueValue;
+
+        if(Math.abs(blueValue - redValue) < smallestDifference){
+            smallestDifference = Math.abs(blueValue - redValue);
+        }
+    }
+
+
+    // for all that are close, find the fasest
+    var fastest = 0;
+    for (i in perms){
+        var perm = perms[i];
+        var blueElo  = 0.565 * defratings[perm[0]]  + 0.435 * atkratings[perm[1]];
+        var redElo  = 0.565 * defratings[perm[3]]  + 0.435 * atkratings[perm[2]];
+
+        var blueValue = 1.0 / (1.0 + Math.pow(10, (redElo - blueElo) / 400.0));
+        var redValue = 1.0 - blueValue;
+
+	var distance = Math.abs(blueValue - redValue);
+	if(distance <= smallestDifference + 0.2){
+	    var speed = (atkratings[perm[1]] + atkratings[perm[2]]) / (defratings[perm[0]] + defratings[perm[3]]);
+	    if(speed > fastest){
+		fastest = speed;
+		ids = perm;
+	    }
+	}
+
+    }
+    
 
     set_player('bluedef', ids[0]);
     set_player('blueatk', ids[1]);
